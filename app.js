@@ -5,9 +5,17 @@ var categoryInput = document.getElementById('category');
 var addExpenseBtn = document.getElementById('add-expense');
 var expenseList = document.querySelector('.expense-list');
 
-//get all stored expenses and display it on page
-var expenses = JSON.parse(localStorage.getItem("expenses")) || [];
-expenses.forEach(addElementsAndButtons);
+//get all stored expenses in local storage object and display it on page
+var expenses = Object.keys(localStorage); //array of keys
+//  console.log(expenses)   
+expenses.forEach((key) => {
+    let expense = localStorage.getItem(key);
+    //console.log(expense);
+    let expenseDetails = JSON.parse(expense);
+    //console.log(expenseDetails)
+    addElementsAndButtons(expenseDetails)
+});
+//expenses.forEach(addElementsAndButtons);
 
 //event listeners
 addExpenseBtn.addEventListener('click', addExpense);
@@ -19,13 +27,14 @@ function addExpense(e) {
     const amount = expenseAmountInput.value;
     const description = descriptionInput.value;
     const category = categoryInput.value;
-    
+
+    if(!amount && !description) {   //if no input
+        alert("Invalid details!");
+    } else {
     const expenseObject = addToArray(amount, description, category);
-
-    localStorage.setItem("expenses", JSON.stringify(expenses));
-
+    localStorage.setItem(amount, JSON.stringify(expenseObject)); //using amount as unique identifier
     addElementsAndButtons(expenseObject);
-    
+    }
 }
 
 function addToArray(amount, description, category) {
@@ -70,6 +79,7 @@ function addElementsAndButtons({amount, description, category}) {
     editBtn.className = "edit-expense";
     editBtn.innerText = "Edit";
     expenseLi.appendChild(editBtn);
+    editBtn.addEventListener('click', editEle);
 
     //append li to expenseList ul
     expenseList.appendChild(expenseLi)
@@ -77,10 +87,28 @@ function addElementsAndButtons({amount, description, category}) {
 }
 
 function deleteEle(e) {
-    console.log(expenses);
-    const btn = e.target.parentNode;
-    console.log(btn)
-    btn.remove();
+    const item = e.target.parentNode;
+    //console.log(item.childNodes)
+    //get child nodes of item
+    const children = item.childNodes;
+    const expense = parseInt(children[0].innerText.slice(7)); //get expense amount from string
+    localStorage.removeItem(expense);   //remove from local storage
+    item.remove();  //remove from page
 }
 
+function editEle(e) {
+    const item = e.target.parentNode;
+    const children = item.childNodes;
+    const expense = parseInt(children[0].innerText.slice(7));
+    const description = children[1].innerText.slice(12);
+    const category = children[2].innerText.slice(9);
+    console.log(category)
 
+    const expenseAmountInput = document.getElementById('expense-amount');
+    expenseAmountInput.value = expense;
+    const descriptionInput = document.getElementById('description');
+    descriptionInput.value = description
+    const categoryInput = document.getElementById('category');
+    console.log(categoryInput)
+    categoryInput.value = category;
+}
