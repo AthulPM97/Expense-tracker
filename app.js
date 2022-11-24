@@ -72,6 +72,7 @@ function addElementsAndButtons({amount, description, category}) {
     deleteBtn.className = "delete-expense";
     deleteBtn.innerText = "Delete";
     expenseLi.appendChild(deleteBtn);
+    //delete event
     deleteBtn.addEventListener('click', deleteEle);
 
     //make and append edit button
@@ -79,6 +80,7 @@ function addElementsAndButtons({amount, description, category}) {
     editBtn.className = "edit-expense";
     editBtn.innerText = "Edit";
     expenseLi.appendChild(editBtn);
+    //edit event
     editBtn.addEventListener('click', editEle);
 
     //append li to expenseList ul
@@ -97,18 +99,32 @@ function deleteEle(e) {
 }
 
 function editEle(e) {
+    const editBtn = e.target;
+    editBtn.innerText = "Done"
     const item = e.target.parentNode;
     const children = item.childNodes;
     const expense = parseInt(children[0].innerText.slice(7));
-    const description = children[1].innerText.slice(12);
-    const category = children[2].innerText.slice(9);
-    console.log(category)
+    
+    //get stored expense and prefill input boxes
+    const storedExpense = JSON.parse(localStorage.getItem(expense));
+    //delete stored expense from local storage
+    localStorage.removeItem(expense);
+    //console.log(storedExpense.amount);
+    expenseAmountInput.value = storedExpense.amount;
+    descriptionInput.value = storedExpense.description;
+    categoryInput.value = storedExpense.category;
+       
 
-    const expenseAmountInput = document.getElementById('expense-amount');
-    expenseAmountInput.value = expense;
-    const descriptionInput = document.getElementById('description');
-    descriptionInput.value = description
-    const categoryInput = document.getElementById('category');
-    console.log(categoryInput)
-    categoryInput.value = category;
+    editBtn.addEventListener('click', (e) => {
+        editBtn.innerText = "Edit";
+        //get new input
+        const newAmount = expenseAmountInput.value;
+        const newDesc = descriptionInput.value;
+        const newCategory = categoryInput.value;
+        const newObj = {amount: newAmount, description: newDesc, category: newCategory};
+        //save to local storage
+        localStorage.setItem(newAmount, JSON.stringify(newObj));
+        //reload page to reflect changes
+        location.reload();
+    });
 }
