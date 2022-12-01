@@ -1,0 +1,22 @@
+form {
+    margin: auto;
+    padding: 10px;
+}
+.expense-item {
+    list-style: none;
+    width: 50%;
+    background-color: azure;
+    border-radius: 20px;
+    text-align: center;
+    padding: 10px;
+}
+.delete-expense {
+    background-color: red;
+    border-radius: 10px;
+}
+.edit-expense {
+    border-radius: 10px;
+}
+#add-expense {
+    border-radius: 10px;
+}
