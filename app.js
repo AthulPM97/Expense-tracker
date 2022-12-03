@@ -5,17 +5,18 @@ var categoryInput = document.getElementById('category');
 var addExpenseBtn = document.getElementById('add-expense');
 var expenseList = document.querySelector('.expense-list');
 
-//get all stored expenses in local storage object and display it on page
-var expenses = Object.keys(localStorage); //array of keys
-//  console.log(expenses)   
-expenses.forEach((key) => {
-    let expense = localStorage.getItem(key);
-    //console.log(expense);
-    let expenseDetails = JSON.parse(expense);
-    //console.log(expenseDetails)
-    addElementsAndButtons(expenseDetails)
+//get all stored expenses from crudcrud and display it on page
+
+document.addEventListener('DOMContentLoaded', () => {
+    axios.get('https://crudcrud.com/api/ac0ff283c3b2478b9a504228642336f7/expenses')
+    .then((response) => {
+        const expenses = response.data;
+        expenses.forEach((expense) => {
+            addElementsAndButtons(expense);
+        })
+    })
+    .catch(err => console.log(err));
 });
-//expenses.forEach(addElementsAndButtons);
 
 //event listeners
 addExpenseBtn.addEventListener('click', addExpense);
@@ -31,41 +32,34 @@ function addExpense(e) {
     if(!amount && !description) {   //if no input
         alert("Invalid details!");
     } else {
-    const expenseObject = addToArray(amount, description, category);
-    localStorage.setItem(amount, JSON.stringify(expenseObject)); //using amount as unique identifier
-    addElementsAndButtons(expenseObject);
+        const expenseObject = {amount, description, category};
+        //localStorage.setItem(amount, JSON.stringify(expenseObject)); //using amount as unique identifier
+        axios.post('https://crudcrud.com/api/ac0ff283c3b2478b9a504228642336f7/expenses',
+        expenseObject)
+        .then((response) => {
+            console.log(response.data);
+            addElementsAndButtons(response.data);
+        })
+        .catch((err) => console.log(err));
     }
 }
 
-function addToArray(amount, description, category) {
-    if(amount && description && category)
-    expenses.push({
-        amount,
-        description,
-        category
-    });
-
-    return {amount, description, category};
-}
-
-
-function addElementsAndButtons({amount, description, category}) {
+function addElementsAndButtons(expense) {
     //one expense Item is 1 li with 3 <p> tags and 2 buttons
     //create list item
     const expenseLi = document.createElement('li');
     expenseLi.className = "expense-item";
     //amount text node
     const amountNode = document.createElement('p');
-    amountNode.innerText = "Amount: " + amount;
+    amountNode.innerText = "Amount: " + expense.amount;
     //description text node
     const descriptionNode = document.createElement('p');
-    descriptionNode.innerText = "Description: " + description;
+    descriptionNode.innerText = "Description: " + expense.description;
     //category text node
     const categoryNode = document.createElement('p');
-    categoryNode.innerText = "Category: " + category;
+    categoryNode.innerText = "Category: " + expense.category;
     //append to expenseLI
     expenseLi.append(amountNode, descriptionNode, categoryNode);
-    
     
     //make and append delete button
     const deleteBtn = document.createElement('button');
@@ -73,58 +67,60 @@ function addElementsAndButtons({amount, description, category}) {
     deleteBtn.innerText = "Delete";
     expenseLi.appendChild(deleteBtn);
     //delete event
-    deleteBtn.addEventListener('click', deleteEle);
+    deleteBtn.addEventListener('click', (e) => {
+        const item = e.target.parentNode;
+        axios.delete(`https://crudcrud.com/api/ac0ff283c3b2478b9a504228642336f7/expenses/${expense._id}`);  
+        //remove from page
+        item.remove();
+    });
 
     //make and append edit button
     const editBtn = document.createElement('button');
+    
     editBtn.className = "edit-expense";
     editBtn.innerText = "Edit";
     expenseLi.appendChild(editBtn);
+
     //edit event
-    editBtn.addEventListener('click', editEle);
+    editBtn.expense = expense;
+    editBtn.addEventListener('click', (e) => {
+        const expenseLi = e.target.parentNode;
+        console.log("editing");
+        const editBtn = e.target;
+        console.log(editBtn.expense)
+        editBtn.style.display = 'none';
+        
+        const doneBtn = document.createElement('button');
+        doneBtn.className = 'edit-expense';
+        doneBtn.innerText = "Done";
+        expenseLi.appendChild(doneBtn);
+        doneBtn.expense = editBtn.expense;
+        
+        //prefill input boxes
+        expenseAmountInput.value = editBtn.expense.amount;
+        descriptionInput.value = editBtn.expense.description;
+        categoryInput.value = editBtn.expense.category;
+                     
+
+        doneBtn.addEventListener('click', (e) => {
+            console.log(expenseAmountInput)
+            const doneBtn = e.target;
+            //get new input
+            const newAmount = expenseAmountInput.value;
+            const newDesc = descriptionInput.value;
+            const newCategory = categoryInput.value;
+            const newObj = {amount: newAmount, description: newDesc, category: newCategory};
+            axios.put(`https://crudcrud.com/api/ac0ff283c3b2478b9a504228642336f7/expenses/${doneBtn.expense._id}`,newObj)
+            .then(() => {
+                doneBtn.remove();
+                location.reload();
+            })
+            .catch(err => console.log(err));
+        });
+    });
 
     //append li to expenseList ul
     expenseList.appendChild(expenseLi)
     
 }
 
-function deleteEle(e) {
-    const item = e.target.parentNode;
-    //console.log(item.childNodes)
-    //get child nodes of item
-    const children = item.childNodes;
-    const expense = parseInt(children[0].innerText.slice(7)); //get expense amount from string
-    localStorage.removeItem(expense);   //remove from local storage
-    item.remove();  //remove from page
-}
-
-function editEle(e) {
-    const editBtn = e.target;
-    editBtn.innerText = "Done"
-    const item = e.target.parentNode;
-    const children = item.childNodes;
-    const expense = parseInt(children[0].innerText.slice(7));
-    
-    //get stored expense and prefill input boxes
-    const storedExpense = JSON.parse(localStorage.getItem(expense));
-    //delete stored expense from local storage
-    localStorage.removeItem(expense);
-    //console.log(storedExpense.amount);
-    expenseAmountInput.value = storedExpense.amount;
-    descriptionInput.value = storedExpense.description;
-    categoryInput.value = storedExpense.category;
-       
-
-    editBtn.addEventListener('click', (e) => {
-        editBtn.innerText = "Edit";
-        //get new input
-        const newAmount = expenseAmountInput.value;
-        const newDesc = descriptionInput.value;
-        const newCategory = categoryInput.value;
-        const newObj = {amount: newAmount, description: newDesc, category: newCategory};
-        //save to local storage
-        localStorage.setItem(newAmount, JSON.stringify(newObj));
-        //reload page to reflect changes
-        location.reload();
-    });
-}
