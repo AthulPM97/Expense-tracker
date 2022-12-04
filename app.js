@@ -7,22 +7,37 @@ var expenseList = document.querySelector('.expense-list');
 
 //get all stored expenses from crudcrud and display it on page
 
-document.addEventListener('DOMContentLoaded', () => {
-    axios.get('https://crudcrud.com/api/ac0ff283c3b2478b9a504228642336f7/expenses')
-    .then((response) => {
+// document.addEventListener('DOMContentLoaded', async () => {
+//     try {
+//       const response = await axios.get('https://crudcrud.com/api/d43a3266fc7c442bb1e083a2c5f8db38/expenses')
+//       const expenses = response.data;
+//       expenses.forEach((expense) => {
+//           addElementsAndButtons(expense);
+//       })
+//     } catch(err) {
+//       console.log(err)
+//     }
+//     // .catch(err => console.log(err));
+// });
+
+document.addEventListener('DOMContentLoaded', async () => {
+    try{
+        const response = await axios.get('https://crudcrud.com/api/d43a3266fc7c442bb1e083a2c5f8db38/expenses');
         const expenses = response.data;
         expenses.forEach((expense) => {
             addElementsAndButtons(expense);
         })
-    })
-    .catch(err => console.log(err));
+    }
+    catch(err) {
+        console.log(err);
+    }
 });
 
 //event listeners
 addExpenseBtn.addEventListener('click', addExpense);
 
 //functions
-function addExpense(e) {
+async function addExpense(e) {
     e.preventDefault();
     //create expense object
     const amount = expenseAmountInput.value;
@@ -32,15 +47,15 @@ function addExpense(e) {
     if(!amount && !description) {   //if no input
         alert("Invalid details!");
     } else {
-        const expenseObject = {amount, description, category};
-        //localStorage.setItem(amount, JSON.stringify(expenseObject)); //using amount as unique identifier
-        axios.post('https://crudcrud.com/api/ac0ff283c3b2478b9a504228642336f7/expenses',
-        expenseObject)
-        .then((response) => {
-            console.log(response.data);
+        try{
+            const expenseObject = {amount, description, category};
+            const response = await 
+            axios.post('https://crudcrud.com/api/d43a3266fc7c442bb1e083a2c5f8db38/expenses',
+            expenseObject);
             addElementsAndButtons(response.data);
-        })
-        .catch((err) => console.log(err));
+        } catch(err) {
+            console.log(err);
+        }
     }
 }
 
@@ -67,11 +82,16 @@ function addElementsAndButtons(expense) {
     deleteBtn.innerText = "Delete";
     expenseLi.appendChild(deleteBtn);
     //delete event
-    deleteBtn.addEventListener('click', (e) => {
-        const item = e.target.parentNode;
-        axios.delete(`https://crudcrud.com/api/ac0ff283c3b2478b9a504228642336f7/expenses/${expense._id}`);  
-        //remove from page
-        item.remove();
+    deleteBtn.addEventListener('click', async (e) => {
+        try{
+            const item = e.target.parentNode;
+            const response = await axios.delete(`https://crudcrud.com/api/d43a3266fc7c442bb1e083a2c5f8db38/expenses/${expense._id}`);  
+            //remove from page
+            item.remove();
+        } catch(err) {
+            console.log(err);
+        }
+        
     });
 
     //make and append edit button
@@ -83,13 +103,15 @@ function addElementsAndButtons(expense) {
 
     //edit event
     editBtn.expense = expense;
-    editBtn.addEventListener('click', (e) => {
+    editBtn.addEventListener('click', async (e) => {
         const expenseLi = e.target.parentNode;
         console.log("editing");
         const editBtn = e.target;
         console.log(editBtn.expense)
+        //hide edit button 
         editBtn.style.display = 'none';
         
+        //create and append done button        
         const doneBtn = document.createElement('button');
         doneBtn.className = 'edit-expense';
         doneBtn.innerText = "Done";
@@ -101,26 +123,27 @@ function addElementsAndButtons(expense) {
         descriptionInput.value = editBtn.expense.description;
         categoryInput.value = editBtn.expense.category;
                      
-
-        doneBtn.addEventListener('click', (e) => {
-            console.log(expenseAmountInput)
-            const doneBtn = e.target;
-            //get new input
-            const newAmount = expenseAmountInput.value;
-            const newDesc = descriptionInput.value;
-            const newCategory = categoryInput.value;
-            const newObj = {amount: newAmount, description: newDesc, category: newCategory};
-            axios.put(`https://crudcrud.com/api/ac0ff283c3b2478b9a504228642336f7/expenses/${doneBtn.expense._id}`,newObj)
-            .then(() => {
+        //done button click event
+        doneBtn.addEventListener('click', async (e) => {
+            try{
+                const doneBtn = e.target;
+                //get new input
+                const newAmount = expenseAmountInput.value;
+                const newDesc = descriptionInput.value;
+                const newCategory = categoryInput.value;
+                const newObj = {amount: newAmount, description: newDesc, category: newCategory};
+                const response = await axios.put(`https://crudcrud.com/api/d43a3266fc7c442bb1e083a2c5f8db38/expenses/${doneBtn.expense._id}`,newObj)
                 doneBtn.remove();
                 location.reload();
-            })
-            .catch(err => console.log(err));
+            } catch(err) {
+                console.log(err);
+            }
+            
         });
-    });
+        
+});
 
-    //append li to expenseList ul
-    expenseList.appendChild(expenseLi)
     
+//append li to expenseList ul
+expenseList.appendChild(expenseLi)
 }
-
