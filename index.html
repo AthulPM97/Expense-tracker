@@ -12,18 +12,23 @@
     <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
-    <form>
-        <input type="number" id="expense-amount" placeholder="Enter expense amount" required>
-        <input type="text" id="description" placeholder="Provide a description" required>
-        <label for="category">Category:</label>
-        <select name="category" id="category">
-            <option value="fuel">Fuel</option>
-            <option value="food">Food</option>
-            <option value="electricity">Electricity</option>
-            <option value="movie">movie</option>
-        </select>
-        <button type="submit" id="add-expense">Add expense</button>
-    </form>
+    <div class="container-fluid">
+        <form>
+            <div class="input-group">
+                <input type="number" class="form-control" id="expense-amount" placeholder="Enter expense amount" required>
+                <input type="text" class="form-control" id="description" placeholder="Provide a description" required>
+            </div>
+            <label for="category" class="form-label">Category:</label>
+            <select name="category" id="category">
+                <option value="fuel">Fuel</option>
+                <option value="food">Food</option>
+                <option value="electricity">Electricity</option>
+                <option value="movie">movie</option>
+            </select>
+            <button type="submit" id="add-expense">Add expense</button>
+        </form>
+    </div>
+   <div class="container-fluid">
     <div class="expense-container">
         <ul class="expense-list">
             <!--one expense item is an li with 3 <p> tags and 2 buttons
@@ -36,6 +41,8 @@
             </li> -->
         </ul>
     </div>
+   </div>
+    
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="app.js"></script>
 </body>
