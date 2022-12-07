@@ -5,7 +5,7 @@ form {
 .expense-item {
     list-style: none;
     width: 50%;
-    background-color: azure;
+    background-color: lightblue;
     border-radius: 20px;
     text-align: center;
     padding: 10px;
@@ -14,6 +14,7 @@ form {
 .delete-expense {
     background-color: red;
     border-radius: 10px;
+    margin: 10px;
 }
 .edit-expense {
     border-radius: 10px;
