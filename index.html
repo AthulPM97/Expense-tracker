@@ -14,18 +14,16 @@
 <body>
     <div class="container-fluid">
         <form>
-            <div class="input-group">
-                <input type="number" class="form-control" id="expense-amount" placeholder="Enter expense amount" required>
-                <input type="text" class="form-control" id="description" placeholder="Provide a description" required>
-            </div>
+            <input type="number" class="form-control" id="expense-amount" placeholder="Enter expense amount" required>
+            <input type="text" class="form-control" id="description" placeholder="Provide a description" required>
             <label for="category" class="form-label">Category:</label>
-            <select name="category" id="category">
+            <select name="category" id="category" class="form-select">
                 <option value="fuel">Fuel</option>
                 <option value="food">Food</option>
                 <option value="electricity">Electricity</option>
                 <option value="movie">movie</option>
             </select>
-            <button type="submit" id="add-expense">Add expense</button>
+            <button type="submit" id="add-expense" class="btn btn-primary">Add expense</button>
         </form>
     </div>
    <div class="container-fluid">
