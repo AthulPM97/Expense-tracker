@@ -30,6 +30,6 @@ exports.deleteExpense = (req, res, next) => {
   const id = req.params.id;
   Expense.findByPk(id)
     .then((expense) => expense.destroy())
-    .then(() => res.status(200))
+    .then(() => res.json({'status': 'ok'}))
     .catch((err) => console.log(err));
 };

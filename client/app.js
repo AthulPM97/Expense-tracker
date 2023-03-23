@@ -71,17 +71,16 @@ function addElementsAndButtons(expense) {
   deleteBtn.innerText = "Delete";
   expenseLi.appendChild(deleteBtn);
   //delete event
-  deleteBtn.addEventListener("click", async (e) => {
-    try {
-      const item = e.target.parentNode;
-      const response = await axios.delete(
-        `http://localhost:3000/user/delete-expense/${expense.id}`
-      );
-      //remove from page
-      if (response.ok) item.remove();
-    } catch (err) {
-      console.log(err);
-    }
+  deleteBtn.addEventListener("click", (e) => {
+    const item = e.target.parentNode;
+    axios
+      .delete(`http://localhost:3000/user/delete-expense/${expense.id}`)
+      .then((res) => {
+        //remove from page
+        console.log('removed!');
+        item.remove();
+      })
+      .catch((err) => console.log(err));
   });
 
   //make and append edit button
