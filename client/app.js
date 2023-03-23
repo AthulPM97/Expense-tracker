@@ -9,9 +9,7 @@ var expenseList = document.querySelector(".expense-list");
 
 document.addEventListener("DOMContentLoaded", async () => {
   try {
-    const response = await axios.get(
-      "http://localhost:3000/user/expenses"
-    );
+    const response = await axios.get("http://localhost:3000/user/expenses");
     const expenses = response.data;
     expenses.forEach((expense) => {
       addElementsAndButtons(expense);
@@ -77,10 +75,10 @@ function addElementsAndButtons(expense) {
     try {
       const item = e.target.parentNode;
       const response = await axios.delete(
-        `https://crudcrud.com/api/7ceec0f6c3d64625a22e38bd199de676/expenses/${expense._id}`
+        `http://localhost:3000/user/delete-expense/${expense.id}`
       );
       //remove from page
-      item.remove();
+      if (response.ok) item.remove();
     } catch (err) {
       console.log(err);
     }
@@ -129,7 +127,7 @@ function addElementsAndButtons(expense) {
           category: newCategory,
         };
         const response = await axios.put(
-          `https://crudcrud.com/api/7ceec0f6c3d64625a22e38bd199de676/expenses/${doneBtn.expense._id}`,
+          `http://localhost:3000/user/expenses/${doneBtn.expense.id}`,
           newObj
         );
         doneBtn.remove();
